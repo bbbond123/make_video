@@ -164,9 +164,151 @@
 
 ### 技术选型状态
 - [x] 视频生成工具：Sora2 + n8n
-- [ ] 配音工具：待选
-- [ ] 字幕工具：待选
-- [ ] 国内访问方案：待确认
+- [x] 配音工具：阿里云通义TTS / Edge-TTS（免费）
+- [x] 自动发布：social-auto-upload
+- [x] 国内访问方案：API中转站
+
+---
+
+## 四-B、扩展研究（详细）
+
+### 1. Cameo 角色一致性功能
+
+> 来源：[Sora2 Cameo API教程](https://www.cnblogs.com/grsai/p/19234635)
+
+**什么是 Cameo：**
+- 上传个人验证视频，提取面部特征、体型和声音特征
+- 将自己/朋友/宠物/原创角色放入 AI 生成的视频中
+- 在不同镜头切换时保持角色外貌、衣着一致
+
+**使用方法：**
+```
+1. 创建 Cameo 形象（录制短视频）
+2. 在提示词中加入 cameo:姓名 标记
+3. 或使用 @用户ID 调用公开 Cameo
+```
+
+**API 参数要求：**
+- 格式：MP4，公开访问 URL
+- 时长：最长 3 秒
+- 时间戳格式：`start_second,end_second`
+- 提示词语法：`@character` + 位置索引
+
+**价格：**
+- GrsAi 中转：**¥0.08/条**（史低价）
+
+**注意事项：**
+- Cameo 请求需 24 小时内处理
+- 保持描述一致性，避免混合冲突特征
+- 原版需美国/加拿大 IP + 邀请码
+
+---
+
+### 2. 自动发布到多平台
+
+> 来源：[social-auto-upload](https://github.com/dreammis/social-auto-upload)
+
+**支持平台：**
+
+| 平台 | 状态 | 备注 |
+|-----|------|------|
+| 抖音 | ✅ | 支持定时发布 |
+| 小红书 | ✅ | 支持定时发布 |
+| 视频号 | ✅ | 支持定时发布 |
+| 快手 | ✅ | 支持定时发布 |
+| Bilibili | ✅ | 支持定时发布 |
+| 百家号 | ✅ | 支持定时发布 |
+| TikTok | ✅ | 需代理 |
+| YouTube | 🔄 | 计划中 |
+
+**安装部署：**
+```bash
+git clone https://github.com/dreammis/social-auto-upload.git
+conda create -n social-auto-upload python=3.10
+pip install -r requirements.txt
+playwright install chromium firefox
+```
+
+**使用流程：**
+```
+1. 获取各平台 Cookie
+2. 准备视频文件（.mp4）
+3. 运行上传脚本
+4. 支持 Docker 部署（Web界面：localhost:5409）
+```
+
+**与 n8n 集成：**
+- B站有教程："n8n 批量生成热门小红书抖音视频自动发布"
+- 可实现：生成视频 → 自动上传 → 定时发布
+
+---
+
+### 3. 中文配音方案
+
+**推荐方案对比：**
+
+| 方案 | 类型 | 价格 | 特点 |
+|-----|------|------|------|
+| [阿里云通义TTS](https://help.aliyun.com/zh/model-studio/qwen-tts) | 云服务 | 按量付费 | 多语种方言，粤语/天津/东北话 |
+| [百度TTS](https://ai.baidu.com/tech/speech/tts) | 云服务 | 按量付费 | REST API + 离线SDK |
+| [Azure TTS](https://azure.microsoft.com/zh-cn/products/ai-services/ai-speech) | 云服务 | 按量付费 | 140+语言，400+音色，情感控制 |
+| [Edge-TTS](https://github.com/rany2/edge-tts) | 开源免费 | **免费** | 微软在线服务，OpenAI兼容 |
+| [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) | 开源 | 免费 | 1分钟克隆音色，支持方言 |
+| [CosyVoice](https://github.com/FunAudioLLM/CosyVoice) | 开源 | 免费 | 情绪/语调/方言，阿里出品 |
+
+**推荐组合：**
+- **低成本**：Edge-TTS（免费）+ CosyVoice（本地）
+- **高质量**：阿里云通义TTS / Azure TTS
+
+---
+
+### 4. n8n 部署方案
+
+> 来源：[n8n中文版安装指南](https://zhuanlan.zhihu.com/p/1910426360054285764)
+
+**部署方式：**
+
+| 方式 | 适合人群 | 难度 |
+|-----|---------|------|
+| npm 全局安装 | Node.js 开发者 | 中 |
+| Docker run | 大多数用户（推荐） | 低 |
+| Docker Compose | 最佳实践 | 低 |
+| 钞能力一键包 | Windows 小白 | 最低 |
+
+**Docker Compose 示例：**
+```yaml
+version: '3'
+services:
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - ~/.n8n:/home/node/.n8n
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=your_password
+```
+
+**中文汉化：**
+- 下载汉化包
+- 修改配置文件（添加 zh-cn 路径）
+- 重启容器
+
+---
+
+### 5. Sora2 国内访问方案
+
+**API 中转站：**
+- 多个第三方平台提供中转服务
+- 价格约 ¥0.6 = $1（六折优惠）
+- 无需美国 IP，无需邀请码
+- 支持 Cameo、Remix 功能
+
+**获取方式：**
+- 通过教程中的邀请链接注册
+- 新用户赠送 $0.4 免费额度（约1条视频）
 
 ---
 
@@ -426,3 +568,4 @@ AI 人物生成 / 动画
 | 2025-12-25 | 初始计划创建 |
 | 2025-12-25 | 整合原始需求文档 |
 | 2025-12-25 | 新增 Sora2+n8n 技术方案及钞能力一键包教程 |
+| 2025-12-25 | 扩展研究：Cameo、自动发布、配音、n8n部署、国内访问 |
