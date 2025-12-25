@@ -1,5 +1,47 @@
 # AI 视频批量生产系统 - 项目计划
 
+---
+
+## 🎯 快速概览（当前状态）
+
+### 项目定位
+**「AI 虚拟人物 + 文案驱动的视频工厂」**
+
+### 核心目标
+- 输入：文案
+- 输出：每天 3 条 AI 视频（30-60秒）
+- 平台：全平台通用
+
+### 技术栈已确定 ✅
+
+| 模块 | 选型 | 状态 |
+|-----|------|------|
+| 视频生成 | Sora2 API | ✅ |
+| 自动化调度 | n8n | ✅ |
+| 提示词生成 | DeepSeek V3.2 | ✅ |
+| 配音 | Edge-TTS（免费）/ 阿里云TTS | ✅ |
+| 自动发布 | social-auto-upload | ✅ |
+| 部署方式 | 钞能力一键包 / Docker | ✅ |
+
+### 成本估算
+
+| 项目 | 费用 |
+|-----|------|
+| 钞能力一键包 | ¥19.9（本地版）/ ¥59.9（含远程部署）|
+| API 充值 | ¥0.6 = $1（六折）|
+| Sora2 视频（720P） | $0.10/秒 → **¥65/天**（3条×30秒）|
+| Sora2 视频（1080P） | $0.50/秒 → **¥320/天**（3条×30秒）|
+| Cameo 中转 | ¥0.08/条 |
+| 配音 Edge-TTS | **免费** |
+
+### 待决策项
+
+- [ ] 人物形象：性别/年龄/风格
+- [ ] 视频形态：口播 vs 场景 vs 定格
+- [ ] 是否使用 Cameo 角色一致性
+
+---
+
 ## 项目目标
 
 构建一个自动化视频生产流水线，实现：
@@ -561,6 +603,107 @@ AI 人物生成 / 动画
 
 ---
 
+## 资源链接汇总
+
+### 核心工具
+| 工具 | 链接 | 说明 |
+|-----|------|------|
+| n8n 官方 | https://n8n.io | 自动化工作流平台 |
+| n8n Sora2 模板 | https://n8n.io/workflows/9576 | 生成视频+保存+发布YouTube |
+| social-auto-upload | https://github.com/dreammis/social-auto-upload | 多平台自动发布 |
+
+### 教程资源
+| 资源 | 链接 |
+|-----|------|
+| 视频教程（钞能力一键包） | https://www.youtube.com/watch?v=A_BMIcoVais |
+| Sora2+n8n 批量生成 | https://zhuanlan.zhihu.com/p/1961861041882366094 |
+| 飞书多维表格批量生成 | https://c.m.163.com/news/a/KBE214DJ05118O92.html |
+| Sora2 Cameo API教程 | https://www.cnblogs.com/grsai/p/19234635 |
+| n8n 中文版安装指南 | https://zhuanlan.zhihu.com/p/1910426360054285764 |
+| n8n Docker部署 | https://blog.csdn.net/engchina/article/details/147655494 |
+
+### 配音工具
+| 工具 | 链接 | 说明 |
+|-----|------|------|
+| 阿里云通义TTS | https://help.aliyun.com/zh/model-studio/qwen-tts | 多语种方言 |
+| 百度TTS | https://ai.baidu.com/tech/speech/tts | REST API |
+| Azure TTS | https://azure.microsoft.com/zh-cn/products/ai-services/ai-speech | 400+音色 |
+| Edge-TTS | https://github.com/rany2/edge-tts | **免费** |
+| GPT-SoVITS | https://github.com/RVC-Boss/GPT-SoVITS | 音色克隆 |
+| CosyVoice | https://github.com/FunAudioLLM/CosyVoice | 阿里出品，情感丰富 |
+
+### Sora2 相关
+| 资源 | 链接 |
+|-----|------|
+| Sora2 官方 | https://openai.com/sora/ |
+| Sora2 使用教程 | https://www.sora2ai.run/zh/tutorial |
+| Sora2 国内中转站汇总 | https://blog.csdn.net/qq_44866828/details/152408034 |
+
+---
+
+## 对话汇总记录
+
+### 2025-12-25 对话要点
+
+#### 1. 项目背景确认
+- 用户需求：每天稳定产出 3 条 AI 视频
+- 内容类型：生活类，以人物形象为主
+- 没有原视频素材，需要完全 AI 生成
+- 全平台通用发布
+
+#### 2. 技术方案确定
+- **推荐方案**：Sora2 + n8n + 钞能力一键包
+- **优势**：无需GPU、国内可用、零配置部署、支持Cameo
+- **成本**：720P约¥65/天，1080P约¥320/天
+
+#### 3. 关键功能说明
+
+**Cameo 角色一致性：**
+- 上传3秒视频提取面部/体型/声音
+- 保持多镜头角色一致
+- 价格：¥0.08/条
+
+**自动发布：**
+- social-auto-upload 支持 7 个平台
+- 抖音/小红书/视频号/快手/B站/百家号/TikTok
+- 支持定时发布
+
+**配音方案：**
+- 免费首选：Edge-TTS
+- 本地高质量：CosyVoice、GPT-SoVITS
+- 商用推荐：阿里云通义TTS
+
+#### 4. 部署方式
+
+**钞能力一键包（Windows）：**
+```
+1. 下载解压一键包
+2. 双击"启动vscode"
+3. Shift+Ctrl+P → 运行任务 → 启动n8n
+4. 填入 API 密钥（DeepSeek + Sora2）
+5. 开始使用
+```
+
+**Docker Compose：**
+```yaml
+version: '3'
+services:
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - ~/.n8n:/home/node/.n8n
+```
+
+#### 5. 待决策事项
+- 人物形象设计（性别/年龄/风格）
+- 视频形态选择（口播/场景/定格）
+- 是否使用 Cameo 功能
+- 配音方案最终选择
+
+---
+
 ## 更新日志
 
 | 日期 | 内容 |
@@ -569,3 +712,4 @@ AI 人物生成 / 动画
 | 2025-12-25 | 整合原始需求文档 |
 | 2025-12-25 | 新增 Sora2+n8n 技术方案及钞能力一键包教程 |
 | 2025-12-25 | 扩展研究：Cameo、自动发布、配音、n8n部署、国内访问 |
+| 2025-12-25 | 新增快速概览、资源链接汇总、对话汇总记录 |
